@@ -135,3 +135,76 @@ Missing or invalid fields return a `400` response with validation error details.
   "message": "Logged Out"
 }
 ```
+
+## Captain Registration Endpoint
+
+- **Path:** `POST /captains/register`
+- **Description:** Creates a new captain account with personal details and vehicle information, then issues a JWT auth token.
+
+### Request Body
+
+Send JSON with the following structure:
+
+```json
+{
+  "fullname": {
+    "firstname": "string (min 3 chars, required)",
+    "lastname": "string (min 3 chars, optional)"
+  },
+  "email": "string (valid email format, required)",
+  "password": "string (min 6 chars, required)",
+  "vehicle": {
+    "color": "string (min 3 chars, required)",
+    "plate": "string (min 3 chars, required)",
+    "capacity": "number (min 1, required)",
+    "vehicleType": "string (one of: car, motorcycle, auto)"
+  }
+}
+```
+
+### Validation Rules
+
+- `fullname.firstname` must be at least 3 characters.
+- `email` must be a valid email address.
+- `password` must be at least 6 characters.
+- `vehicle.color` must be at least 3 characters.
+- `vehicle.plate` must be at least 3 characters.
+- `vehicle.capacity` must be an integer with minimum value 1.
+- `vehicle.vehicleType` must be one of `car`, `motorcycle`, or `auto`.
+- If a captain with the same `email` already exists, the API returns a `400` with message `Captain already exists`.
+
+Missing or invalid fields return a `400` response with validation error details.
+
+### Responses
+
+- `201 Created`: Returns the newly created captain object and a JWT auth token.
+- `400 Bad Request`: Request body fails validation or captain already exists.
+
+### Response Example (`201`)
+
+```json
+{
+  "token": "jwt-token-string",
+  "captain": {
+    "_id": "object-id",
+    "fullname": {
+      "firstname": "Jane",
+      "lastname": "Doe"
+    },
+    "email": "jane.doe@example.com",
+    "status": "inactive",
+    "vehicle": {
+      "color": "Black",
+      "plate": "ABC-1234",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "socketId": null,
+    "location": {
+      "lat": null,
+      "lng": null
+    }
+  }
+}
+```
+
