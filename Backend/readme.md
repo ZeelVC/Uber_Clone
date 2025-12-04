@@ -208,3 +208,112 @@ Missing or invalid fields return a `400` response with validation error details.
 }
 ```
 
+## Captain Login Endpoint
+
+- **Path:** `POST /captains/login`
+- **Description:** Authenticates an existing captain with email and password, then issues a JWT stored in the `token` cookie and returned in the response body.
+
+### Request Body
+
+```json
+{
+  "email": "jane.doe@example.com",
+  "password": "plain-text-password"
+}
+```
+
+### Responses
+
+- `200 OK`: Returns the authenticated captain object plus a JWT.
+- `400 Bad Request`: Request body fails validation.
+- `401 Unauthorized`: Email not found or password mismatch.
+
+### Response Example (`200`)
+
+```json
+{
+  "token": "jwt-token-string",
+  "captain": {
+    "_id": "object-id",
+    "fullname": {
+      "firstname": "Jane",
+      "lastname": "Doe"
+    },
+    "email": "jane.doe@example.com",
+    "status": "inactive",
+    "vehicle": {
+      "color": "Black",
+      "plate": "ABC-1234",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "socketId": null,
+    "location": {
+      "lat": null,
+      "lng": null
+    }
+  }
+}
+```
+
+## Captain Profile Endpoint
+
+- **Path:** `GET /captains/profile`
+- **Description:** Returns the authenticated captain's profile using the JWT stored in the `token` cookie or `Authorization` header.
+- **Auth:** Requires a valid JWT; otherwise returns a `401`.
+
+### Request Headers
+
+- `Cookie: token=<jwt>` or `Authorization: Bearer <jwt>`
+
+### Responses
+
+- `200 OK`: Returns the captain object populated by the auth middleware.
+- `401 Unauthorized`: Missing or invalid token.
+
+### Response Example (`200`)
+
+```json
+{
+  "captain": {
+    "_id": "object-id",
+    "fullname": {
+      "firstname": "Jane",
+      "lastname": "Doe"
+    },
+    "email": "jane.doe@example.com",
+    "status": "inactive",
+    "vehicle": {
+      "color": "Black",
+      "plate": "ABC-1234",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "socketId": null,
+    "location": {
+      "lat": null,
+      "lng": null
+    }
+  }
+}
+```
+
+## Captain Logout Endpoint
+
+- **Path:** `GET /captains/logout`
+- **Description:** Clears the auth cookie and blacklists the current JWT to prevent reuse.
+- **Auth:** Requires a valid JWT; otherwise returns a `401`.
+
+### Responses
+
+- `200 OK`: Cookie cleared and token stored in blacklist.
+- `401 Unauthorized`: Missing or invalid token.
+
+### Response Example (`200`)
+
+```json
+{
+  "message": "Logged Out"
+}
+```
+
